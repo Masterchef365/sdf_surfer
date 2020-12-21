@@ -42,7 +42,9 @@ impl PlayerMovement {
         self.yaw += x * SENSITIVITY_X;
         self.speed += y * SENSITIVITY_Y;
 
-        Matrix4::new_translation(&self.position) * Matrix4::from_euler_angles(0., self.yaw, 0.)
+        self.position += Vector3::new(self.yaw.cos(), 0., self.yaw.sin()) * self.speed;
+
+        Matrix4::from_euler_angles(0., self.yaw, 0.) * Matrix4::new_translation(&self.position)
     }
 }
 
