@@ -12,6 +12,24 @@ use std::time::Duration;
 use structopt::StructOpt;
 use wiiboard::WiiBoardRealtime;
 
+#[derive(Debug, StructOpt)]
+#[structopt(name = "SDF Surfer", about = "Signed Distance Functions BUT SURFING BABEY")]
+struct Opt {
+    /// Use OpenXR backend
+    #[structopt(short, long)]
+    vr: bool,
+
+    /// Set shader directory (will look for glsl files to update, and will use those as fragment
+    /// shaders)
+    #[structopt(short, long)]
+    shader_path: PathBuf,
+}
+
+fn main() -> Result<()> {
+    let args = Opt::from_args();
+    launch::<MyApp>(args.vr, args)
+}
+
 struct MyApp {
     fullscreen: Object,
     time: f32,
@@ -84,8 +102,8 @@ impl App for MyApp {
 
         Ok(FramePacket {
             objects: vec![self.fullscreen],
-            //base_transform: Matrix4::identity(),
-            base_transform: Matrix4::new_translation(&nalgebra::Vector3::new(self.time, 0.0, 0.0)),
+            base_transform: Matrix4::identity(),
+            //base_transform: Matrix4::new_translation(&nalgebra::Vector3::new(self.time, 0.0, 0.0)),
         })
     }
 }
@@ -107,24 +125,6 @@ fn load_shader(
         None,
     )?;
     engine.add_material(FULLSCREEN_VERT, spirv.as_binary_u8(), DrawType::Triangles)
-}
-
-#[derive(Debug, StructOpt)]
-#[structopt(name = "SDF Surfer", about = "Signed Distance Functions BUT SURFING BABEY")]
-struct Opt {
-    /// Use OpenXR backend
-    #[structopt(short, long)]
-    vr: bool,
-
-    /// Set shader directory (will look for glsl files to update, and will use those as fragment
-    /// shaders)
-    #[structopt(short, long)]
-    shader_path: PathBuf,
-}
-
-fn main() -> Result<()> {
-    let args = Opt::from_args();
-    launch::<MyApp>(args.vr, args)
 }
 
 fn fullscreen_quad() -> (Vec<Vertex>, Vec<u16>) {
