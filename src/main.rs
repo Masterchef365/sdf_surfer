@@ -111,7 +111,6 @@ impl App for MyApp {
         Ok(FramePacket {
             objects: vec![self.fullscreen],
             base_transform: self.movement.player_transform(),
-            //base_transform: Matrix4::new_translation(&nalgebra::Vector3::new(self.time, 0.0, 0.0)),
         })
     }
 }

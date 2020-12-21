@@ -6,6 +6,7 @@ use pid::Pid;
 
 const SENSITIVITY_X: f32 = 0.01;
 const SENSITIVITY_Y: f32 = 0.02;
+const ZERO_RADIUS: f32 = 0.02;
 const SPEED: f32 = 0.1;
 
 pub struct PlayerMovement {
@@ -33,7 +34,11 @@ impl PlayerMovement {
     }
 
     pub fn player_transform(&mut self) -> Matrix4<f32> {
-        let (x, y) = self.input_device.get_axes().expect("Input error");
+        let (mut x, mut y) = self.input_device.get_axes().expect("Input error");
+        if (x * x + y * y).sqrt() < ZERO_RADIUS {
+            x = 0.;
+            y = 0.;
+        }
         self.yaw += x * SENSITIVITY_X;
         self.speed += y * SENSITIVITY_Y;
 
@@ -75,6 +80,7 @@ impl GamepadAxes {
 
 impl TwoAxis for GamepadAxes {
     fn get_axes(&mut self) -> Result<(f32, f32)> {
+        self.gilrs.next_event();
         self.gilrs.next_event();
         let x = self
             .gilrs
