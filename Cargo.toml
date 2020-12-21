@@ -11,6 +11,7 @@ gilrs = "0.8"
 notify = "4.0"
 structopt = { version = "0.3", default-features = false }
 shaderc = "0.7"
+pid = "2.1.0"
 
 [dependencies.wiiboard]
 git = "https://github.com/Masterchef365/wiiboard.git"

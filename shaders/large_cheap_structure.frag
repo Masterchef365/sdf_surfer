@@ -40,7 +40,7 @@ float rand(vec2 co){
 }
 
 SDF scene(vec3 pos) {
-    ivec2 cell = ivec2(pos.xz);
+    ivec2 cell = ivec2(pos.xz + 90.);
     pos.xz = fract(pos.xz);
     float m = rand(vec2(cell));
 

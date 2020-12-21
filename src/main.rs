@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
 use klystron::{
     runtime_3d::{launch, App},
-    DrawType, Engine, FramePacket, Material, Matrix4, Object, Vertex,
+    DrawType, Engine, FramePacket, Material, Object, Vertex,
 };
 use notify::{watcher, DebouncedEvent, RecommendedWatcher, RecursiveMode, Watcher};
 use shaderc::Compiler;
@@ -10,7 +10,9 @@ use std::path::PathBuf;
 use std::sync::mpsc::{channel, Receiver};
 use std::time::Duration;
 use structopt::StructOpt;
-use wiiboard::WiiBoardRealtime;
+use nalgebra::{Vector3, Matrix4};
+mod motion;
+use motion::PlayerMovement;
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "SDF Surfer", about = "Signed Distance Functions BUT SURFING BABEY")]
@@ -18,6 +20,10 @@ struct Opt {
     /// Use OpenXR backend
     #[structopt(short, long)]
     vr: bool,
+
+    /// Use Wii balance board
+    #[structopt(short, long)]
+    balance: bool,
 
     /// Set shader directory (will look for glsl files to update, and will use those as fragment
     /// shaders)
@@ -31,6 +37,7 @@ fn main() -> Result<()> {
 }
 
 struct MyApp {
+    movement: PlayerMovement,
     fullscreen: Object,
     time: f32,
     compiler: Compiler,
@@ -69,6 +76,7 @@ impl App for MyApp {
         };
 
         Ok(Self {
+            movement: PlayerMovement::new(args.balance)?,
             file_watch_rx,
             _file_watcher: file_watcher,
             compiler,
@@ -102,7 +110,7 @@ impl App for MyApp {
 
         Ok(FramePacket {
             objects: vec![self.fullscreen],
-            base_transform: Matrix4::identity(),
+            base_transform: self.movement.player_transform(),
             //base_transform: Matrix4::new_translation(&nalgebra::Vector3::new(self.time, 0.0, 0.0)),
         })
     }
